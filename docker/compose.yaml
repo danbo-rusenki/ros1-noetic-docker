@@ -1,0 +1,48 @@
+services:
+  ros-noetic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - UID=1000
+        - GID=1000
+        - USERNAME=ros
+    container_name: ros-noetic
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      # - XAUTHORITY=/tmp/.docker.xauth
+      - ROS_DISTRO=noetic
+      - ROS_PACKAGE_PATH=/home/${USER:-ros}/catkin_ws/src
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      # Wayland/Hybrid GPU環境で黒画面になるときの保険（任意）
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
+      - __NV_PRIME_RENDER_OFFLOAD=1
+    volumes:
+      # X11 (GUI 用)
+      # - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Xauthority（無ければ無視されます）
+      # - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      # ワークスペースをホストと共有（必要に応じてパス調整）
+      - ./catkin_ws:/home/${USER:-ros}/catkin_ws
+    # devices:
+      # OpenGL/描画（Intel/AMD の人はこれでだいたいOK）
+      # - /dev/dri:/dev/dri
+      # 必要ならシリアルなども追加例: - /dev/ttyUSB0:/dev/ttyUSB0
+    network_mode: host   # ROS1 では host ネットワークが楽
+    ipc: host
+    ulimits:
+      core: 0
+    stdin_open: true
+    tty: true
+    # 必要なら --privileged: true でもOK（USB等で困ったら一時的に）
+    # user は Dockerfile 側で作成したユーザが使われます（ENTRYPOINTで切替済）
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all 
+              capabilities: [gpu, utility, compute, graphics]
