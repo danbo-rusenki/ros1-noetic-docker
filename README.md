@@ -66,4 +66,11 @@ apt-get install -y \
     librealsense2-utils \
     librealsense2-dev \
     librealsense2-dbg
+    
+apt-get install -y \
+  libgl1-mesa-dri \      
+  libglx-mesa0 \           
+  mesa-vulkan-drivers \    
+  mesa-utils 
 
+export LIBGL_ALWAYS_SOFTWARE=1
