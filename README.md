@@ -66,7 +66,17 @@ apt-get install -y \
     librealsense2-utils \
     librealsense2-dev \
     librealsense2-dbg
-    
+
+apt-cache policy librealsense2 | grep 2.50 || true
+
+# 例：2.50.0 が見える場合
+sudo apt-get install -y \
+  'librealsense2=2.50.*' \
+  'librealsense2-gl=2.50.*' \
+  'librealsense2-udev-rules=2.50.*' \
+  'librealsense2-dev=2.50.*'
+
+
 apt-get install -y \
   libgl1-mesa-dri \      
   libglx-mesa0 \           
